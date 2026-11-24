@@ -4,14 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>EPUB Maker</title>
-<link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#8a5a2b">
-
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,400;0,600;1,400;1,600&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#efe5cc;--paper:#fbf5e4;--ink:#3b3126;--mute:#7d6e58;--line:#d9ccaa;--acc:#8a5a2b;--accf:#fff8e8;--hl:#f3e6c4;
+:root{--bg:#F3EFE5;--paper:#FBF9F3;--ink:#34382F;--mute:#77796D;--line:#DDD9CC;--acc:#43A047;--accf:#FFFDF8;--hl:#E5F2E3;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2a231a;--paper:#352d22;--ink:#eadfc6;--mute:#b3a384;--line:#4d4231;--acc:#d8a468;--accf:#2a231a;--hl:#463b2a;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#2a231a;--paper:#352d22;--ink:#eadfc6;--mute:#b3a384;--line:#4d4231;--acc:#d8a468;--accf:#2a231a;--hl:#463b2a;color-scheme:dark}
+:root[data-theme="dark"]{--bg:#292D27;--paper:#343A32;--ink:#F0EBDD;--mute:#B9B9A9;--line:#50584B;--acc:#81C784;--accf:#252A24;--hl:#394B38;color-scheme:dark}
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 'Sarabun',system-ui,sans-serif}
@@ -26,7 +23,7 @@ input[type=text],input[type=number],textarea{width:100%;font:inherit;color:var(-
 textarea{min-height:80px;resize:vertical}
 input:focus,textarea:focus,#ed:focus{outline:2px solid var(--acc);outline-offset:-1px}
 button{font:inherit;cursor:pointer;color:var(--ink);background:var(--hl);border:1px solid var(--line);border-radius:8px;padding:5px 10px}
-button:hover{border-color:var(--acc)}
+button:hover{border-color:var(--acc);background:var(--hl);filter:brightness(.97)}
 button.pri{background:var(--acc);color:var(--accf);border-color:var(--acc);font-weight:600;padding:10px 18px}
 .cover{display:flex;gap:12px;align-items:center}
 #cv{width:84px;height:120px;border:1px dashed var(--line);border-radius:6px;background:var(--accf) center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:.75rem;text-align:center;flex:none}
@@ -38,9 +35,6 @@ button.pri{background:var(--acc);color:var(--accf);border-color:var(--acc);font-
 #ed p,#ed h2,#ed h3{margin:0}
 #ed h2,#ed h3{margin:.6em 0 .4em}#ed h2{font-size:1.4rem}#ed h3{font-size:1.18rem}
 #ed img{max-width:100%;height:auto}
-#ed .page-break{display:flex;align-items:center;gap:8px;margin:18px 0;border:1px dashed var(--acc);border-radius:7px;padding:8px;color:var(--acc);font-size:.85rem;background:var(--hl)}
-#ed .page-break:before,#ed .page-break:after{content:"";height:1px;background:var(--line);flex:1}
-#ed .page-break span{white-space:nowrap}
 .fi{text-indent:2em}.ind{margin-left:2em}.al-l{text-align:left}.al-c{text-align:center}.al-r{text-align:right}
 #st{margin-left:10px;font-size:.9rem;color:var(--mute)}
 .chk{display:inline-flex;gap:6px;align-items:center;font-size:.9rem;color:var(--ink);margin:0}
@@ -81,7 +75,7 @@ button.pri{background:var(--acc);color:var(--accf);border-color:var(--acc);font-
 <button data-c="b"><b>หนา</b></button><button data-c="i"><i>เอียง</i></button><button data-c="bi"><b><i>หนาเอียง</i></b></button>
 <button data-c="al-l">ชิดซ้าย</button><button data-c="al-c">กึ่งกลาง</button><button data-c="al-r">ชิดขวา</button>
 <button data-c="ind">ย่อหน้า</button><button data-c="fi">ย่อบรรทัดแรก</button>
-<button data-c="img">🖼 รูป</button><button data-c="pagebreak">↧ ขึ้นหน้าใหม่</button><input type="file" id="imf" accept="image/*" hidden>
+<button data-c="img">🖼 รูป</button><input type="file" id="imf" accept="image/*" hidden>
 </div></div>
 <div id="ed" contenteditable="true" spellcheck="false"></div>
 <div class="row" style="margin-top:10px;align-items:center">
@@ -92,11 +86,10 @@ button.pri{background:var(--acc);color:var(--accf);border-color:var(--acc);font-
 <p class="sub" style="margin:6px 0 0">วางข้อความได้เลย (ระบบจะวางเป็นข้อความธรรมดา แต่ละบรรทัดเป็นหนึ่งย่อหน้า) · กด Enter เพื่อขึ้นบรรทัดใหม่ · Enter ซ้ำเพื่อเว้นบรรทัด</p>
 </div>
 
-<div class="row" style="margin-top:12px"><button type="button" id="saveProject">บันทึกโปรเจกต์</button><button type="button" id="loadProject">เปิดโปรเจกต์</button><input type="file" id="projectFile" accept="application/json,.json" hidden></div>
 <button class="pri" id="mk" type="button">สร้างไฟล์ EPUB</button><span id="st"></span>
 </div>
 
-<script src="./vendor/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const $=s=>document.querySelector(s),ed=$('#ed'),IDS=['title','author','translator','vol','year','publisher','lang','desc'];
 const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -113,13 +106,6 @@ function readFile(f){return new Promise(r=>{const x=new FileReader();x.onload=()
 
 try{const d=JSON.parse(localStorage.getItem('epubmk')||'null');if(d){IDS.forEach(i=>{if(d.m[i]!=null)$('#'+i).value=d.m[i]});chs=d.chs;cur=Math.min(d.cur,chs.length-1);cover=d.cover}}catch(e){}
 showCover();load();
-if('serviceWorker' in navigator && location.protocol!=='file:'){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
-
-// Portable project backup: includes book metadata, chapters, images and manual page breaks.
-function downloadBlob(blob,name){const a=document.createElement('a');const u=URL.createObjectURL(blob);a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1500)}
-$('#saveProject').onclick=()=>{keep();const m={};IDS.forEach(i=>m[i]=$('#'+i).value);const data={format:'epub-maker-project',version:1,savedAt:new Date().toISOString(),m,chs,cur,cover};downloadBlob(new Blob([JSON.stringify(data)],{type:'application/json'}),(m.title||'epub-project').replace(/[\\/:*?"<>|]/g,'_')+'.epubmaker.json');status('บันทึกโปรเจกต์แล้ว ✓')};
-$('#loadProject').onclick=()=>$('#projectFile').click();
-$('#projectFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const d=JSON.parse(await f.text());if(d.format!=='epub-maker-project'||!Array.isArray(d.chs)||!d.m)throw new Error('format');IDS.forEach(i=>$('#'+i).value=d.m[i]??'');chs=d.chs;cur=Math.max(0,Math.min(Number(d.cur)||0,chs.length-1));cover=d.cover||null;showCover();load();persist();status('เปิดโปรเจกต์แล้ว ✓')}catch(err){status('ไฟล์โปรเจกต์ไม่ถูกต้อง')}};
 
 document.addEventListener('input',persist);
 $('#ct').addEventListener('input',()=>{chs[cur].t=$('#ct').value;rl()});
@@ -139,10 +125,6 @@ function tog(c){const bs=blocks(),all=bs.length&&bs.every(b=>b.classList.contain
 function heading(t){const bs=blocks(),all=bs.length&&bs.every(b=>b.tagName==t.toUpperCase());document.execCommand('formatBlock',false,all?'p':t)}
 function bi(){const b=document.queryCommandState('bold'),i=document.queryCommandState('italic');if(b&&i){document.execCommand('bold');document.execCommand('italic')}else{if(!b)document.execCommand('bold');if(!i)document.execCommand('italic')}}
 function putImg(src){document.execCommand('insertHTML',false,'<p class="al-c"><img src="'+src+'" alt=""></p><p><br></p>')}
-function insertPageBreak(){
-  const marker='<div class="page-break" data-page-break="true" contenteditable="false"><span>ขึ้นหน้าใหม่</span></div><p><br></p>';
-  document.execCommand('insertHTML',false,marker);persist();
-}
 
 // Thai PDF compatibility: conservative mappings confirmed from 5-kamma.pdf.
 // Unknown PUA and U+FFFD are intentionally preserved for review.
@@ -171,7 +153,6 @@ $('#tb').addEventListener('mousedown',e=>{if(e.target.closest('button'))e.preven
 $('#tb').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const c=b.dataset.c;ed.focus();
 if(c=='h2'||c=='h3')heading(c);else if(c=='b')document.execCommand('bold');else if(c=='i')document.execCommand('italic');else if(c=='bi')bi();
 else if(c.startsWith('al-'))setAl(c);else if(c=='ind'||c=='fi')tog(c);else if(c=='img'){$('#imf').click();return}
-else if(c=='pagebreak'){insertPageBreak();return}
 persist()});
 $('#imf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const s=await readFile(f);ed.focus();putImg(s);persist()};
 ed.addEventListener('paste',async e=>{e.preventDefault();const cd=e.clipboardData,f=[...cd.files].find(x=>x.type.startsWith('image/'));
@@ -195,7 +176,6 @@ function ser(n,im){
  if(n.nodeType==3)return esc(n.nodeValue);
  if(n.nodeType!=1)return'';
  const t=n.tagName,k=()=>[...n.childNodes].map(c=>ser(c,im)).join('');
- if(n.getAttribute&&n.getAttribute('data-page-break')==='true')return'<div class="page-break" style="break-before:page;page-break-before:always"></div>';
  if(t=='BR')return'<br/>';
  if(t=='IMG'){const m=(n.getAttribute('src')||'').match(/^data:image\/([\w+]+);base64,(.*)$/);if(!m)return'';
   const ext={jpeg:'jpg','svg+xml':'svg'}[m[1]]||m[1],name='images/img'+(im.length+1)+'.'+ext;im.push({name,b64:m[2],type:'image/'+m[1]});return'<img src="'+name+'" alt=""/>'}
@@ -211,7 +191,7 @@ function bodyOf(html,im){const d=document.createElement('div');d.innerHTML=html;
  d.childNodes.forEach(n=>{if(n.nodeType==3){if(n.nodeValue.trim())o+='<p>'+esc(n.nodeValue)+'</p>'}else o+=ser(n,im)});return o||'<p>&#160;</p>'}
 const X='<?xml version="1.0" encoding="utf-8"?>\n';
 function page(lang,title,body){return X+'<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="'+lang+'" xml:lang="'+lang+'"><head><meta charset="utf-8"/><title>'+esc(title)+'</title><link rel="stylesheet" type="text/css" href="style.css"/></head><body>'+body+'</body></html>'}
-const CSS='body{line-height:1.8;margin:1em}p{margin:0}.page-break{break-before:page;page-break-before:always;height:0;display:block}h2,h3{text-align:center;margin:1.4em 0 1em;line-height:1.4}h2{font-size:1.4em}h3{font-size:1.15em}.fi{text-indent:2em}.ind{margin-left:2em}.al-l{text-align:left}.al-c{text-align:center}.al-r{text-align:right}img{max-width:100%;height:auto;display:block;margin:.6em auto}.cv{margin:0;text-align:center}.cv img{max-height:100%;margin:0 auto}.info{margin-top:30%;text-align:center}.info p{margin:.5em 0}';
+const CSS='body{line-height:1.8;margin:1em}p{margin:0}h2,h3{text-align:center;margin:1.4em 0 1em;line-height:1.4}h2{font-size:1.4em}h3{font-size:1.15em}.fi{text-indent:2em}.ind{margin-left:2em}.al-l{text-align:left}.al-c{text-align:center}.al-r{text-align:right}img{max-width:100%;height:auto;display:block;margin:.6em auto}.cv{margin:0;text-align:center}.cv img{max-height:100%;margin:0 auto}.info{margin-top:30%;text-align:center}.info p{margin:.5em 0}';
 
 $('#mk').onclick=async()=>{
  keep();const v={};IDS.forEach(i=>v[i]=$('#'+i).value.trim());
