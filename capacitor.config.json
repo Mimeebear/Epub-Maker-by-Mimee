@@ -1,0 +1,6 @@
+{
+  "appId": "org.mimeereader.epubmaker",
+  "appName": "EPUB Maker",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}

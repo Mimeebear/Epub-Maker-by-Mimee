@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EPUB Maker</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#8a5a2b">
+
+<style>
+:root{--bg:#efe5cc;--paper:#fbf5e4;--ink:#3b3126;--mute:#7d6e58;--line:#d9ccaa;--acc:#8a5a2b;--accf:#fff8e8;--hl:#f3e6c4;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2a231a;--paper:#352d22;--ink:#eadfc6;--mute:#b3a384;--line:#4d4231;--acc:#d8a468;--accf:#2a231a;--hl:#463b2a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#2a231a;--paper:#352d22;--ink:#eadfc6;--mute:#b3a384;--line:#4d4231;--acc:#d8a468;--accf:#2a231a;--hl:#463b2a;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 'Sarabun',system-ui,sans-serif}
+.wrap{max-width:820px;margin:0 auto;padding:16px 14px 40px}
+h1{font-size:1.5rem;margin:6px 0 2px}.sub{color:var(--mute);margin:0 0 14px;font-size:.9rem}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:14px;box-shadow:0 1px 3px rgba(80,60,20,.08)}
+.card h2{font-size:1.05rem;margin:0 0 10px;color:var(--acc)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.full{grid-column:1/-1}
+label{display:block;font-size:.82rem;color:var(--mute);margin-bottom:2px}
+input[type=text],input[type=number],textarea{width:100%;font:inherit;color:var(--ink);background:var(--accf);border:1px solid var(--line);border-radius:8px;padding:7px 10px}
+textarea{min-height:80px;resize:vertical}
+input:focus,textarea:focus,#ed:focus{outline:2px solid var(--acc);outline-offset:-1px}
+button{font:inherit;cursor:pointer;color:var(--ink);background:var(--hl);border:1px solid var(--line);border-radius:8px;padding:5px 10px}
+button:hover{border-color:var(--acc)}
+button.pri{background:var(--acc);color:var(--accf);border-color:var(--acc);font-weight:600;padding:10px 18px}
+.cover{display:flex;gap:12px;align-items:center}
+#cv{width:84px;height:120px;border:1px dashed var(--line);border-radius:6px;background:var(--accf) center/cover no-repeat;display:flex;align-items:center;justify-content:center;color:var(--mute);font-size:.75rem;text-align:center;flex:none}
+.chs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px}
+.chs button{white-space:nowrap}.chs button.on{background:var(--acc);color:var(--accf);border-color:var(--acc)}
+.row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center}
+.tb{position:sticky;top:env(safe-area-inset-top,0px);background:var(--paper);z-index:5;padding:6px 0;border-bottom:1px solid var(--line);margin-bottom:8px}
+#ed{min-height:360px;background:var(--accf);border:1px solid var(--line);border-radius:8px;padding:14px 16px;font-size:1.05rem;line-height:1.8;overflow-wrap:anywhere}
+#ed p,#ed h2,#ed h3{margin:0}
+#ed h2,#ed h3{margin:.6em 0 .4em}#ed h2{font-size:1.4rem}#ed h3{font-size:1.18rem}
+#ed img{max-width:100%;height:auto}
+#ed .page-break{display:flex;align-items:center;gap:8px;margin:18px 0;border:1px dashed var(--acc);border-radius:7px;padding:8px;color:var(--acc);font-size:.85rem;background:var(--hl)}
+#ed .page-break:before,#ed .page-break:after{content:"";height:1px;background:var(--line);flex:1}
+#ed .page-break span{white-space:nowrap}
+.fi{text-indent:2em}.ind{margin-left:2em}.al-l{text-align:left}.al-c{text-align:center}.al-r{text-align:right}
+#st{margin-left:10px;font-size:.9rem;color:var(--mute)}
+.chk{display:inline-flex;gap:6px;align-items:center;font-size:.9rem;color:var(--ink);margin:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>📖 EPUB Maker</h1>
+<p class="sub">สร้างไฟล์ e-book (.epub) จากข้อความและรูปของคุณ</p>
+
+<div class="card"><h2>ข้อมูลหนังสือ</h2>
+<div class="grid">
+<div class="full"><label>ชื่อหนังสือ *</label><input type="text" id="title"></div>
+<div><label>ผู้แต่ง</label><input type="text" id="author"></div>
+<div><label>ผู้แปล</label><input type="text" id="translator"></div>
+<div><label>เล่มที่ (vol)</label><input type="text" id="vol" placeholder="เช่น 1"></div>
+<div><label>ปีที่พิมพ์</label><input type="text" id="year" placeholder="เช่น 2026"></div>
+<div><label>สำนักพิมพ์</label><input type="text" id="publisher"></div>
+<div><label>ภาษา (รหัส)</label><input type="text" id="lang" value="th"></div>
+<div class="full"><label>รายละเอียดหนังสือ</label><textarea id="desc"></textarea></div>
+<div class="full cover"><div id="cv">ยังไม่มีปก</div>
+<div><button id="cvb" type="button">เลือกรูปปก</button> <button id="cvx" type="button">ลบปก</button><input type="file" id="cvf" accept="image/*" hidden></div></div>
+</div></div>
+
+<div class="card"><h2>เนื้อหา</h2>
+<div class="chs" id="chs"></div>
+<div class="row">
+<button type="button" id="addc">＋ เพิ่มบท</button>
+<button type="button" id="delc">ลบบทนี้</button>
+<button type="button" id="mvl">◀ เลื่อนซ้าย</button>
+<button type="button" id="mvr">เลื่อนขวา ▶</button>
+</div>
+<div class="row"><div style="flex:1;min-width:200px"><label>ชื่อบท</label><input type="text" id="ct"></div>
+<label class="chk" style="margin-top:18px"><input type="checkbox" id="showt" checked> แสดงชื่อบทเป็นหัวข้อในหน้า</label></div>
+<div class="tb" id="tb">
+<div class="row" style="margin:0">
+<button data-c="h2">หัวข้อ</button><button data-c="h3">หัวข้อย่อย</button>
+<button data-c="b"><b>หนา</b></button><button data-c="i"><i>เอียง</i></button><button data-c="bi"><b><i>หนาเอียง</i></b></button>
+<button data-c="al-l">ชิดซ้าย</button><button data-c="al-c">กึ่งกลาง</button><button data-c="al-r">ชิดขวา</button>
+<button data-c="ind">ย่อหน้า</button><button data-c="fi">ย่อบรรทัดแรก</button>
+<button data-c="img">🖼 รูป</button><button data-c="pagebreak">↧ ขึ้นหน้าใหม่</button><input type="file" id="imf" accept="image/*" hidden>
+</div></div>
+<div id="ed" contenteditable="true" spellcheck="false"></div>
+<div class="row" style="margin-top:10px;align-items:center">
+<label class="chk"><input type="checkbox" id="thaiPdfFix" checked> แก้ไขอักขระไทยจาก PDF อัตโนมัติ</label>
+<button type="button" id="fixThaiNow">แก้ข้อความในหน้านี้</button>
+</div>
+<p class="sub" id="thaiFixStatus" style="margin:4px 0 0">รองรับอักขระไทย PUA ที่ตรวจพบใน PDF ตัวอย่าง · ไม่แตะอักขระที่ยังระบุไม่ได้</p>
+<p class="sub" style="margin:6px 0 0">วางข้อความได้เลย (ระบบจะวางเป็นข้อความธรรมดา แต่ละบรรทัดเป็นหนึ่งย่อหน้า) · กด Enter เพื่อขึ้นบรรทัดใหม่ · Enter ซ้ำเพื่อเว้นบรรทัด</p>
+</div>
+
+<div class="row" style="margin-top:12px"><button type="button" id="saveProject">บันทึกโปรเจกต์</button><button type="button" id="loadProject">เปิดโปรเจกต์</button><input type="file" id="projectFile" accept="application/json,.json" hidden></div>
+<button class="pri" id="mk" type="button">สร้างไฟล์ EPUB</button><span id="st"></span>
+</div>
+
+<script src="./vendor/jszip.min.js"></script>
+<script>
+const $=s=>document.querySelector(s),ed=$('#ed'),IDS=['title','author','translator','vol','year','publisher','lang','desc'];
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+let chs=[{t:'บทที่ 1',h:'<p><br></p>'}],cur=0,cover=null,timer;
+try{document.execCommand('defaultParagraphSeparator',false,'p')}catch(e){}
+
+function status(m){$('#st').textContent=m}
+function persist(){clearTimeout(timer);timer=setTimeout(()=>{keep();try{const m={};IDS.forEach(i=>m[i]=$('#'+i).value);localStorage.setItem('epubmk',JSON.stringify({m,chs,cur,cover}))}catch(e){}},600)}
+function keep(){chs[cur].h=ed.innerHTML;chs[cur].t=$('#ct').value;chs[cur].s=$('#showt').checked}
+function load(){ed.innerHTML=chs[cur].h||'<p><br></p>';$('#ct').value=chs[cur].t;$('#showt').checked=chs[cur].s!==false;rl()}
+function rl(){const b=$('#chs');b.innerHTML='';chs.forEach((c,i)=>{const x=document.createElement('button');x.type='button';x.textContent=(i+1)+'. '+(c.t||'(ไม่มีชื่อ)');if(i==cur)x.className='on';x.onclick=()=>{keep();cur=i;load()};b.appendChild(x)})}
+function showCover(){const v=$('#cv');v.style.backgroundImage=cover?'url('+cover+')':'';v.textContent=cover?'':'ยังไม่มีปก'}
+function readFile(f){return new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result);x.readAsDataURL(f)})}
+
+try{const d=JSON.parse(localStorage.getItem('epubmk')||'null');if(d){IDS.forEach(i=>{if(d.m[i]!=null)$('#'+i).value=d.m[i]});chs=d.chs;cur=Math.min(d.cur,chs.length-1);cover=d.cover}}catch(e){}
+showCover();load();
+if('serviceWorker' in navigator && location.protocol!=='file:'){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));}
+
+// Portable project backup: includes book metadata, chapters, images and manual page breaks.
+function downloadBlob(blob,name){const a=document.createElement('a');const u=URL.createObjectURL(blob);a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1500)}
+$('#saveProject').onclick=()=>{keep();const m={};IDS.forEach(i=>m[i]=$('#'+i).value);const data={format:'epub-maker-project',version:1,savedAt:new Date().toISOString(),m,chs,cur,cover};downloadBlob(new Blob([JSON.stringify(data)],{type:'application/json'}),(m.title||'epub-project').replace(/[\\/:*?"<>|]/g,'_')+'.epubmaker.json');status('บันทึกโปรเจกต์แล้ว ✓')};
+$('#loadProject').onclick=()=>$('#projectFile').click();
+$('#projectFile').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;try{const d=JSON.parse(await f.text());if(d.format!=='epub-maker-project'||!Array.isArray(d.chs)||!d.m)throw new Error('format');IDS.forEach(i=>$('#'+i).value=d.m[i]??'');chs=d.chs;cur=Math.max(0,Math.min(Number(d.cur)||0,chs.length-1));cover=d.cover||null;showCover();load();persist();status('เปิดโปรเจกต์แล้ว ✓')}catch(err){status('ไฟล์โปรเจกต์ไม่ถูกต้อง')}};
+
+document.addEventListener('input',persist);
+$('#ct').addEventListener('input',()=>{chs[cur].t=$('#ct').value;rl()});
+$('#addc').onclick=()=>{keep();chs.push({t:'บทที่ '+(chs.length+1),h:'<p><br></p>'});cur=chs.length-1;load();persist()};
+$('#delc').onclick=()=>{if(chs.length<2){status('ต้องมีอย่างน้อย 1 บท');return}if(!confirm('ลบบทนี้?'))return;chs.splice(cur,1);cur=Math.max(0,cur-1);load();persist()};
+function mv(d){keep();const j=cur+d;if(j<0||j>=chs.length)return;[chs[cur],chs[j]]=[chs[j],chs[cur]];cur=j;rl();persist()}
+$('#mvl').onclick=()=>mv(-1);$('#mvr').onclick=()=>mv(1);
+
+$('#cvb').onclick=()=>$('#cvf').click();
+$('#cvf').onchange=async e=>{if(e.target.files[0]){cover=await readFile(e.target.files[0]);showCover();persist()}e.target.value=''};
+$('#cvx').onclick=()=>{cover=null;showCover();persist()};
+
+/* editor */
+function blocks(){const s=getSelection();if(!s.rangeCount)return[];const r=s.getRangeAt(0);return[...ed.children].filter(c=>r.intersectsNode(c))}
+function setAl(c){blocks().forEach(b=>{b.classList.remove('al-l','al-c','al-r');b.classList.add(c)})}
+function tog(c){const bs=blocks(),all=bs.length&&bs.every(b=>b.classList.contains(c));bs.forEach(b=>b.classList.toggle(c,!all))}
+function heading(t){const bs=blocks(),all=bs.length&&bs.every(b=>b.tagName==t.toUpperCase());document.execCommand('formatBlock',false,all?'p':t)}
+function bi(){const b=document.queryCommandState('bold'),i=document.queryCommandState('italic');if(b&&i){document.execCommand('bold');document.execCommand('italic')}else{if(!b)document.execCommand('bold');if(!i)document.execCommand('italic')}}
+function putImg(src){document.execCommand('insertHTML',false,'<p class="al-c"><img src="'+src+'" alt=""></p><p><br></p>')}
+function insertPageBreak(){
+  const marker='<div class="page-break" data-page-break="true" contenteditable="false"><span>ขึ้นหน้าใหม่</span></div><p><br></p>';
+  document.execCommand('insertHTML',false,marker);persist();
+}
+
+// Thai PDF compatibility: conservative mappings confirmed from 5-kamma.pdf.
+// Unknown PUA and U+FFFD are intentionally preserved for review.
+const THAI_PDF_MAP={
+  '\uF70A':'\u0E48', // ่
+  '\uF70B':'\u0E49', // ้
+  '\uF70E':'\u0E4C', // ์
+  '\uF712':'\u0E47'  // ็
+};
+function fixThaiPdfText(text){
+  let changed=0,unknown=0;
+  const output=String(text).replace(/[\uF700-\uF8FF]/g,ch=>{
+    if(Object.prototype.hasOwnProperty.call(THAI_PDF_MAP,ch)){changed++;return THAI_PDF_MAP[ch]}
+    unknown++;return ch;
+  }).normalize('NFC');
+  return {text:output,changed,unknown,replacement:(output.match(/\uFFFD/g)||[]).length};
+}
+function showThaiFixStatus(result){
+  const el=$('#thaiFixStatus');
+  let msg=result.changed+' จุด';
+  if(result.unknown)msg+=' · ยังไม่รู้จัก PUA '+result.unknown+' จุด (คงไว้)';
+  if(result.replacement)msg+=' · พบอักขระเสีย U+FFFD '+result.replacement+' จุด (ต้องตรวจ/OCR)';
+  el.textContent=result.changed?'แก้ไขแล้ว '+msg:'ไม่พบอักขระที่ระบบรู้จัก'+(result.unknown?' · พบ PUA ที่ยังไม่รู้จัก '+result.unknown+' จุด':'')+(result.replacement?' · พบ U+FFFD '+result.replacement+' จุด':'');
+}
+$('#tb').addEventListener('mousedown',e=>{if(e.target.closest('button'))e.preventDefault()});
+$('#tb').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const c=b.dataset.c;ed.focus();
+if(c=='h2'||c=='h3')heading(c);else if(c=='b')document.execCommand('bold');else if(c=='i')document.execCommand('italic');else if(c=='bi')bi();
+else if(c.startsWith('al-'))setAl(c);else if(c=='ind'||c=='fi')tog(c);else if(c=='img'){$('#imf').click();return}
+else if(c=='pagebreak'){insertPageBreak();return}
+persist()});
+$('#imf').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;const s=await readFile(f);ed.focus();putImg(s);persist()};
+ed.addEventListener('paste',async e=>{e.preventDefault();const cd=e.clipboardData,f=[...cd.files].find(x=>x.type.startsWith('image/'));
+if(f){putImg(await readFile(f));persist();return}
+let t=(cd.getData('text/plain')||'').replace(/\r/g,'');
+if($('#thaiPdfFix').checked){const fixed=fixThaiPdfText(t);t=fixed.text;showThaiFixStatus(fixed)}
+document.execCommand('insertHTML',false,t.split('\n').map(l=>l.trim()===''?'<p><br></p>':'<p>'+esc(l)+'</p>').join(''));persist()});
+$('#fixThaiNow').onclick=()=>{
+  keep();
+  const walker=document.createTreeWalker(ed,NodeFilter.SHOW_TEXT);
+  const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+  const total={changed:0,unknown:0,replacement:0};
+  nodes.forEach(node=>{const fixed=fixThaiPdfText(node.nodeValue);node.nodeValue=fixed.text;total.changed+=fixed.changed;total.unknown+=fixed.unknown;total.replacement+=fixed.replacement});
+  keep();persist();showThaiFixStatus(total);
+};
+ed.addEventListener('blur',()=>{if(!ed.firstChild)ed.innerHTML='<p><br></p>'});
+
+/* epub */
+const BL=['P','DIV','H1','H2','H3'];
+function ser(n,im){
+ if(n.nodeType==3)return esc(n.nodeValue);
+ if(n.nodeType!=1)return'';
+ const t=n.tagName,k=()=>[...n.childNodes].map(c=>ser(c,im)).join('');
+ if(n.getAttribute&&n.getAttribute('data-page-break')==='true')return'<div class="page-break" style="break-before:page;page-break-before:always"></div>';
+ if(t=='BR')return'<br/>';
+ if(t=='IMG'){const m=(n.getAttribute('src')||'').match(/^data:image\/([\w+]+);base64,(.*)$/);if(!m)return'';
+  const ext={jpeg:'jpg','svg+xml':'svg'}[m[1]]||m[1],name='images/img'+(im.length+1)+'.'+ext;im.push({name,b64:m[2],type:'image/'+m[1]});return'<img src="'+name+'" alt=""/>'}
+ if(t=='B'||t=='STRONG')return'<strong>'+k()+'</strong>';
+ if(t=='I'||t=='EM')return'<em>'+k()+'</em>';
+ if(BL.includes(t)){
+  if([...n.children].some(c=>BL.includes(c.tagName)))return k();
+  const tag=t=='H1'||t=='H2'?'h2':t=='H3'?'h3':'p',cl=['ind','fi','al-l','al-c','al-r'].filter(c=>n.classList.contains(c)).join(' ');
+  let h=k();if(!h.replace(/<br\/>/g,'').trim())h='&#160;';
+  return'<'+tag+(cl?' class="'+cl+'"':'')+'>'+h+'</'+tag+'>'}
+ return k()}
+function bodyOf(html,im){const d=document.createElement('div');d.innerHTML=html;let o='';
+ d.childNodes.forEach(n=>{if(n.nodeType==3){if(n.nodeValue.trim())o+='<p>'+esc(n.nodeValue)+'</p>'}else o+=ser(n,im)});return o||'<p>&#160;</p>'}
+const X='<?xml version="1.0" encoding="utf-8"?>\n';
+function page(lang,title,body){return X+'<!DOCTYPE html>\n<html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="'+lang+'" xml:lang="'+lang+'"><head><meta charset="utf-8"/><title>'+esc(title)+'</title><link rel="stylesheet" type="text/css" href="style.css"/></head><body>'+body+'</body></html>'}
+const CSS='body{line-height:1.8;margin:1em}p{margin:0}.page-break{break-before:page;page-break-before:always;height:0;display:block}h2,h3{text-align:center;margin:1.4em 0 1em;line-height:1.4}h2{font-size:1.4em}h3{font-size:1.15em}.fi{text-indent:2em}.ind{margin-left:2em}.al-l{text-align:left}.al-c{text-align:center}.al-r{text-align:right}img{max-width:100%;height:auto;display:block;margin:.6em auto}.cv{margin:0;text-align:center}.cv img{max-height:100%;margin:0 auto}.info{margin-top:30%;text-align:center}.info p{margin:.5em 0}';
+
+$('#mk').onclick=async()=>{
+ keep();const v={};IDS.forEach(i=>v[i]=$('#'+i).value.trim());
+ if(!v.title){status('กรุณาใส่ชื่อหนังสือ');$('#title').focus();return}
+ if(typeof JSZip=='undefined'){status('โหลดตัวสร้างไฟล์ไม่สำเร็จ');return}
+ status('กำลังสร้าง…');
+ const lang=v.lang||'th',im=[],z=new JSZip(),id='urn:uuid:'+(crypto.randomUUID?crypto.randomUUID():String(Date.now()));
+ z.file('mimetype','application/epub+zip',{compression:'STORE'});
+ z.file('META-INF/container.xml',X+'<container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"><rootfiles><rootfile full-path="OEBPS/content.opf" media-type="application/oebps-package+xml"/></rootfiles></container>');
+ z.file('OEBPS/style.css',CSS);
+ const mf=[],sp=[];
+ mf.push('<item id="css" href="style.css" media-type="text/css"/>','<item id="nav" href="nav.xhtml" media-type="application/xhtml+xml" properties="nav"/>','<item id="ncx" href="toc.ncx" media-type="application/x-dtbncx+xml"/>');
+ if(cover){const m=cover.match(/^data:image\/([\w+]+);base64,(.*)$/);if(m){const ext={jpeg:'jpg','svg+xml':'svg'}[m[1]]||m[1];
+  z.file('OEBPS/images/cover.'+ext,m[2],{base64:true});
+  mf.push('<item id="cover-img" href="images/cover.'+ext+'" media-type="image/'+m[1]+'" properties="cover-image"/>','<item id="cover" href="cover.xhtml" media-type="application/xhtml+xml"/>');
+  z.file('OEBPS/cover.xhtml',page(lang,'ปก','<div class="cv"><img src="images/cover.'+ext+'" alt="cover"/></div>'));sp.push('<itemref idref="cover"/>')}}
+ let info='<div class="info"><h2>'+esc(v.title)+'</h2>';
+ if(v.vol)info+='<p>เล่มที่ '+esc(v.vol)+'</p>';
+ if(v.author)info+='<p>ผู้แต่ง: '+esc(v.author)+'</p>';
+ if(v.translator)info+='<p>ผู้แปล: '+esc(v.translator)+'</p>';
+ if(v.publisher||v.year)info+='<p>'+esc([v.publisher,v.year].filter(Boolean).join(' · '))+'</p>';
+ if(v.desc)info+='<p class="al-l" style="margin-top:2em">'+esc(v.desc).replace(/\n/g,'<br/>')+'</p>';
+ z.file('OEBPS/info.xhtml',page(lang,v.title,info+'</div>'));
+ mf.push('<item id="info" href="info.xhtml" media-type="application/xhtml+xml"/>');sp.push('<itemref idref="info"/>');
+ const navs=[],ncx=[];
+ chs.forEach((c,i)=>{const n=i+1,t=c.t||'บทที่ '+n;
+  const body=(c.s!==false?'<h2>'+esc(t)+'</h2>':'')+bodyOf(c.h,im);
+  z.file('OEBPS/ch'+n+'.xhtml',page(lang,t,body));
+  mf.push('<item id="ch'+n+'" href="ch'+n+'.xhtml" media-type="application/xhtml+xml"/>');sp.push('<itemref idref="ch'+n+'"/>');
+  navs.push('<li><a href="ch'+n+'.xhtml">'+esc(t)+'</a></li>');
+  ncx.push('<navPoint id="n'+n+'" playOrder="'+n+'"><navLabel><text>'+esc(t)+'</text></navLabel><content src="ch'+n+'.xhtml"/></navPoint>')});
+ const seen={};im.forEach((m,i)=>{z.file('OEBPS/'+m.name,m.b64,{base64:true});mf.push('<item id="im'+i+'" href="'+m.name+'" media-type="'+m.type+'"/>')});
+ z.file('OEBPS/nav.xhtml',page(lang,'สารบัญ','<nav epub:type="toc"><h2>สารบัญ</h2><ol style="list-style:none;padding:0">'+navs.join('')+'</ol></nav>'));
+ z.file('OEBPS/toc.ncx',X+'<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1"><head><meta name="dtb:uid" content="'+id+'"/></head><docTitle><text>'+esc(v.title)+'</text></docTitle><navMap>'+ncx.join('')+'</navMap></ncx>');
+ let md='<dc:identifier id="bid">'+id+'</dc:identifier><dc:title>'+esc(v.title)+(v.vol?' เล่ม '+esc(v.vol):'')+'</dc:title><dc:language>'+esc(lang)+'</dc:language>';
+ if(v.author)md+='<dc:creator id="au">'+esc(v.author)+'</dc:creator><meta refines="#au" property="role" scheme="marc:relators">aut</meta>';
+ if(v.translator)md+='<dc:contributor id="tr">'+esc(v.translator)+'</dc:contributor><meta refines="#tr" property="role" scheme="marc:relators">trl</meta>';
+ if(v.publisher)md+='<dc:publisher>'+esc(v.publisher)+'</dc:publisher>';
+ if(v.year)md+='<dc:date>'+esc(v.year)+'</dc:date>';
+ if(v.desc)md+='<dc:description>'+esc(v.desc)+'</dc:description>';
+ if(v.vol)md+='<meta property="belongs-to-collection" id="col">'+esc(v.title)+'</meta><meta refines="#col" property="collection-type">series</meta><meta refines="#col" property="group-position">'+esc(v.vol)+'</meta>';
+ if(cover)md+='<meta name="cover" content="cover-img"/>';
+ md+='<meta property="dcterms:modified">'+new Date().toISOString().replace(/\.\d+Z$/,'Z')+'</meta>';
+ z.file('OEBPS/content.opf',X+'<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="bid" xml:lang="'+esc(lang)+'"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/">'+md+'</metadata><manifest>'+mf.join('')+'</manifest><spine toc="ncx">'+sp.join('')+'</spine></package>');
+ const blob=await z.generateAsync({type:'blob',mimeType:'application/epub+zip',compression:'DEFLATE'});
+ const fn=(v.title.replace(/[\\/:*?"<>|]/g,'').trim()||'book')+'.epub';
+ try{const dl=window.claude&&await claude.use('downloads');
+  if(dl){await dl.save({filename:fn,data:blob});status('สร้างไฟล์เรียบร้อย ✓')}
+  else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;a.click();status('สร้างไฟล์เรียบร้อย ✓')}
+ }catch(e){status(e&&e.code=='declined'?'ยกเลิกการบันทึก':'บันทึกไฟล์ไม่สำเร็จ')}
+};
+</script>
+</body>
+</html>

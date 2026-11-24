@@ -1,0 +1,10 @@
+{
+  "name": "EPUB Maker",
+  "short_name": "EPUB Maker",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#efe5cc",
+  "theme_color": "#8a5a2b",
+  "description": "สร้างและจัดหน้า e-book EPUB แบบออฟไลน์"
+}
