@@ -1,29 +1,37 @@
 name: Build Android APK
+
 on:
   workflow_dispatch:
   push:
     branches: [ main ]
+
 permissions:
   contents: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
+
       - name: Install dependencies
         run: npm install
+
       - name: Prepare offline web app
         run: npm run build:web
+
       - name: Add Android project
         run: npx cap add android
+
       - name: Sync Capacitor
         run: npx cap sync android
       - name: Set versionCode
