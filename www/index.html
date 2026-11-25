@@ -263,10 +263,21 @@ $('#mk').onclick=async()=>{
  z.file('OEBPS/content.opf',X+'<package xmlns="http://www.idpf.org/2007/opf" version="3.0" unique-identifier="bid" xml:lang="'+esc(lang)+'"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/">'+md+'</metadata><manifest>'+mf.join('')+'</manifest><spine toc="ncx">'+sp.join('')+'</spine></package>');
  const blob=await z.generateAsync({type:'blob',mimeType:'application/epub+zip',compression:'DEFLATE'});
  const fn=(v.title.replace(/[\\/:*?"<>|]/g,'').trim()||'book')+'.epub';
- try{const dl=window.claude&&await claude.use('downloads');
-  if(dl){await dl.save({filename:fn,data:blob});status('สร้างไฟล์เรียบร้อย ✓')}
-  else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;a.click();status('สร้างไฟล์เรียบร้อย ✓')}
- }catch(e){status(e&&e.code=='declined'?'ยกเลิกการบันทึก':'บันทึกไฟล์ไม่สำเร็จ')}
+ try{
+  const cap=window.Capacitor;
+  if(cap&&cap.isNativePlatform&&cap.isNativePlatform()){
+   const {Filesystem,Share}=cap.Plugins;
+   const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]);r.onerror=rej;r.readAsDataURL(blob)});
+   const saved=await Filesystem.writeFile({path:fn,data:b64,directory:'CACHE'});
+   await Share.share({title:fn,url:saved.uri});
+   status('สร้างไฟล์เรียบร้อย ✓');
+  }else{
+   const dl=window.claude&&await claude.use('downloads');
+   if(dl){await dl.save({filename:fn,data:blob})}
+   else{const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fn;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+   status('สร้างไฟล์เรียบร้อย ✓');
+  }
+ }catch(e){status(e&&e.code=='declined'?'ยกเลิกการบันทึก':'บันทึกไฟล์ไม่สำเร็จ: '+(e&&e.message||e))}
 };
 </script>
 </body>
