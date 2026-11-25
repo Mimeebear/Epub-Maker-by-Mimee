@@ -26,10 +26,32 @@ jobs:
         run: npx cap add android
       - name: Sync Capacitor
         run: npx cap sync android
-      - name: Build debug APK
+      - name: Set versionCode
+        working-directory: android/app
+        run: |
+          sed -i -E 's/versionCode [0-9]+/versionCode ${{ github.run_number }}/' build.gradle
+          grep -n "versionCode" build.gradle
+      - name: Build release APK (unsigned)
         working-directory: android
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleRelease
+      - name: Sign APK
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          "$BT/zipalign" -f -p 4 android/app/build/outputs/apk/release/app-release-unsigned.apk "$RUNNER_TEMP/aligned.apk"
+          "$BT/apksigner" sign \
+            --ks "$RUNNER_TEMP/release.jks" \
+            --ks-key-alias "$KEY_ALIAS" \
+            --ks-pass env:KEYSTORE_PASSWORD \
+            --key-pass env:KEY_PASSWORD \
+            --out epub-maker.apk "$RUNNER_TEMP/aligned.apk"
+          "$BT/apksigner" verify epub-maker.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: epub-maker-debug-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: epub-maker-apk
+          path: epub-maker.apk
